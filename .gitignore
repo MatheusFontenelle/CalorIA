@@ -1,0 +1,13 @@
+# Garmin Connect IQ build output
+bin/
+
+# Private Garmin developer credentials
+GarminKeys/
+
+# Local editor/workspace state
+.vscode/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+*.swp
