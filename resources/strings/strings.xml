@@ -3,8 +3,8 @@
 
     <string id="prompt">0 KCAL</string>
 
-    <string id="menu_label_add_food">Adicionar alimento</string>
-    <string id="menu_label_view_history">Ver histórico</string>
-    <string id="menu_label_undo_last">Desfazer adição</string>
-    <string id="menu_label_reset_day">Zerar hoje</string>
+    <string id="menu_label_add_food">Adicionar</string>
+    <string id="menu_label_view_history">Histórico</string>
+    <string id="menu_label_undo_last">Desfazer</string>
+    <string id="menu_label_reset_day">Zerar</string>
 </strings>

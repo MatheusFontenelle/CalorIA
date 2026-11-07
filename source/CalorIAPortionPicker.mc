@@ -5,7 +5,6 @@ import Toybox.WatchUi;
 
 //Classe para criar o Picker de porções - step 13
 class CalorIAPortionFactory extends WatchUi.PickerFactory {
-
     var options as Array;
 
     function initialize(options as Array) {
@@ -21,7 +20,10 @@ class CalorIAPortionFactory extends WatchUi.PickerFactory {
         return options[index];
     }
 
-    function getDrawable(index as Number, selected as Boolean) as WatchUi.Drawable? {
+    function getDrawable(
+        index as Number,
+        selected as Boolean
+    ) as WatchUi.Drawable? {
         var option = options[index] as Dictionary;
         var label = option[:label] as String;
 
@@ -30,29 +32,28 @@ class CalorIAPortionFactory extends WatchUi.PickerFactory {
             :font => Graphics.FONT_LARGE,
             :color => Graphics.COLOR_WHITE,
             :locX => WatchUi.LAYOUT_HALIGN_CENTER,
-            :locY => WatchUi.LAYOUT_VALIGN_CENTER
+            :locY => WatchUi.LAYOUT_VALIGN_CENTER,
         });
     }
 }
 
 //Classe para mostrar o Picker de porções - step 14
 class CalorIAPortionPicker extends WatchUi.Picker {
-
     function initialize(titleText as String, portionOptions as Array) {
         var title = new WatchUi.Text({
             :text => titleText,
             :font => Graphics.FONT_MEDIUM,
             :color => Graphics.COLOR_WHITE,
             :locX => WatchUi.LAYOUT_HALIGN_CENTER,
-            :locY => WatchUi.LAYOUT_VALIGN_BOTTOM
+            :locY => WatchUi.LAYOUT_VALIGN_BOTTOM,
         });
 
         var factory = new CalorIAPortionFactory(portionOptions);
-        
+
         Picker.initialize({
             :title => title,
             :pattern => [factory],
-            :defaults => [0]
+            :defaults => [0],
         });
     }
 
@@ -66,7 +67,6 @@ class CalorIAPortionPicker extends WatchUi.Picker {
 
 //Classe para lidar com a seleção do Picker de porções - step 15
 class CalorIAPortionDelegate extends WatchUi.PickerDelegate {
-
     var foodId as String;
     var foodName as String;
 
@@ -90,18 +90,17 @@ class CalorIAPortionDelegate extends WatchUi.PickerDelegate {
             var calories = caloriesValue as Number;
 
             System.println(
-                "Porcao escolhida: " + label + " - " + calories.toString() + " kcal"
+                "Porcao escolhida: " +
+                    label +
+                    " - " +
+                    calories.toString() +
+                    " kcal"
             );
 
-            getApp().addFoodEntry(
-                foodId,
-                foodName,
-                label,
-                calories
-            );
+            getApp().addFoodEntry(foodId, foodName, label, calories);
+        }
+
+        WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+        return true;
     }
-
-    WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
-    return true;
-}
 }

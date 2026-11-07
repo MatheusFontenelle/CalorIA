@@ -13,10 +13,22 @@ class CalorIAMenuDelegate extends WatchUi.MenuInputDelegate {
         } else if (item == :view_history) {
             openHistoryMenu();
         } else if (item == :reset_day) {
-            getApp().resetCalories();
+            self.openResetConfirmation();
         } else if (item == :undo_last) {
             getApp().undoLastFoodEntry();
         }
+    }
+
+    function openResetConfirmation() as Void {
+        var confirmation = new WatchUi.Confirmation(
+            "Zerar hoje?"
+        );
+
+        WatchUi.pushView(
+            confirmation,
+            new CalorIAResetConfirmationDelegate(),
+            WatchUi.SLIDE_UP
+        );
     }
 
     //essa função abre o menu de alimentos, exibindo uma lista de alimentos disponíveis para o usuário selecionar. Cada alimento é representado por seu nome e um identificador simbólico. A função utiliza a classe WatchUi para criar e exibir o menu, permitindo que o usuário escolha um alimento para adicionar ao registro diário de consumo.
@@ -28,10 +40,10 @@ class CalorIAMenuDelegate extends WatchUi.MenuInputDelegate {
             var category = categories[index] as String;
             var foodCount =
                 CalorIAFoodCatalog.getFoodsByCategory(category).size();
-            var countLabel = "alimentos";
+            var countLabel = "itens";
 
             if (foodCount == 1) {
-                countLabel = "alimento";
+                countLabel = "item";
             }
 
             var subLabel = foodCount.toString() + " " + countLabel;
@@ -50,13 +62,13 @@ class CalorIAMenuDelegate extends WatchUi.MenuInputDelegate {
 
     //essa função abre o menu de histórico de entradas de alimentos do dia atual, exibindo cada entrada com o nome do alimento, o rótulo da porção e o valor calórico correspondente. Se não houver registros para o dia, a função exibe uma mensagem indicando que não há registros. A função utiliza a classe WatchUi para criar e exibir o menu, permitindo que o usuário visualize seu histórico de consumo de alimentos.
     function openHistoryMenu() as Void {
-        var historyMenu = new WatchUi.Menu2({ :title => "Histórico de hoje" });
+        var historyMenu = new WatchUi.Menu2({ :title => "Hoje" });
         var entries = getApp().getTodayEntries() as Array<Dictionary>;
 
         if (entries.size() == 0) {
             historyMenu.addItem(
                 new WatchUi.MenuItem(
-                    "Sem registros hoje",
+                    "Sem registros",
                     "",
                     :empty_history,
                     {}
@@ -72,7 +84,7 @@ class CalorIAMenuDelegate extends WatchUi.MenuInputDelegate {
                     portionLabel + " - " + calories.toString() + " kcal ";
 
                 historyMenu.addItem(
-                    new WatchUi.MenuItem(foodName, label, :history_entry, {})
+                    new WatchUi.MenuItem(foodName, label, index, {})
                 );
             }
         }
@@ -95,6 +107,7 @@ class CalorIAHistoryMenuDelegate extends WatchUi.Menu2InputDelegate {
     }
 }
 
+//essa classe é responsável por lidar com a seleção de categorias no menu de categorias. Quando o usuário seleciona uma categoria, a função onSelect é chamada, que busca os alimentos correspondentes à categoria selecionada e cria um novo menu de alimentos. Em seguida, o menu de alimentos é exibido na tela, permitindo que o usuário escolha um alimento específico para adicionar ao registro diário de consumo.
 class CalorIACategoryMenuDelegate extends WatchUi.Menu2InputDelegate {
     function initialize() {
         Menu2InputDelegate.initialize();
