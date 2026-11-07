@@ -1,11 +1,8 @@
 {
 	"folders": [
 		{
-			"path": "../../CalorIA"
-		},
-		{
 			"name": "CalorIA",
-			"path": "../../CalorIA/CalorIA"
+			"path": "."
 		}
 	],
 	"settings": {}

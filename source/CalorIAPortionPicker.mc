@@ -67,8 +67,13 @@ class CalorIAPortionPicker extends WatchUi.Picker {
 //Classe para lidar com a seleção do Picker de porções - step 15
 class CalorIAPortionDelegate extends WatchUi.PickerDelegate {
 
-    function initialize() {
+    var foodId as String;
+    var foodName as String;
+
+    function initialize(foodId as String, foodName as String) {
         PickerDelegate.initialize();
+        self.foodId = foodId;
+        self.foodName = foodName;
     }
 
     function onCancel() as Boolean {
@@ -88,7 +93,12 @@ class CalorIAPortionDelegate extends WatchUi.PickerDelegate {
                 "Porcao escolhida: " + label + " - " + calories.toString() + " kcal"
             );
 
-            getApp().addCalories(calories);
+            getApp().addFoodEntry(
+                foodId,
+                foodName,
+                label,
+                calories
+            );
     }
 
     WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);

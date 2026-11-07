@@ -3,7 +3,8 @@
 
     <string id="prompt">0 KCAL</string>
 
-    <string id="menu_label_1">Resetar calorias</string> // Adiciona a string para o item do menu "Resetar calorias" - step 10
-    <string id="menu_label_2">Adicionar maça</string> // Adiciona a string para o item do menu "Adicionar maça" - step 9
-    <string id="menu_label_3">Adicionar banana</string> 
+    <string id="menu_label_add_food">Adicionar alimento</string>
+    <string id="menu_label_view_history">Ver histórico</string>
+    <string id="menu_label_undo_last">Desfazer adição</string>
+    <string id="menu_label_reset_day">Zerar hoje</string>
 </strings>

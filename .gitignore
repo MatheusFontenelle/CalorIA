@@ -2,6 +2,7 @@
 bin/
 
 # Private Garmin developer credentials
+garmin_key/
 GarminKeys/
 
 # Local editor/workspace state

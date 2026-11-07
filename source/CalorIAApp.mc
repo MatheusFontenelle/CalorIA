@@ -6,128 +6,108 @@ import Toybox.Time.Gregorian;
 
 class CalorIAApp extends Application.AppBase {
 
-    var totalCalories = 0;
-
-//Adição dos alimentos e suas calorias correspondentes - step 4
-    var foodCalories = {
-        :banana => {
-            :name => "Banana",
-            :category => "Fruta",
-            :calories => 105,
-            :portion => "1 unidade",
-
-            :portionOptions => [
-                {
-                    :label => "100g", //Cada porção do alimento e sua devida caloria - step 15
-                    :calories => 105
-                },
-                {
-                    :label => "150g",
-                    :calories => 157
-                },
-                {
-                    :label => "1u (40g)",
-                    :calories => 42
-                },
-                {
-                    :label => "2u (80g)",
-                    :calories => 84
-                }
-            ]
-        },
-
-        :apple => {
-            :name => "Maçã",
-            :category => "Fruta",
-            :calories => 95,
-            :portion => "1 unidade",
-            :portionOptions => [
-                "100g", "150g", "1 unidade", "2 unidades"
-            ]
-        }
-    };
-
-    function getFoodPortionOptions(food as Symbol) as Array? {
-        var foods = foodCalories as Dictionary;
-        var foodData = foods[food];
-
-        if (foodData != null) {
-            var data = foodData as Dictionary;
-            return data[:portionOptions] as Array?;
-        }
-
-        return null;
-    }
-
-    //Uma função para adicionar calorias de um alimento específico ao total - step 3
-    function addFood(food as Symbol) as Void {
-        var foods = foodCalories as Dictionary;
-        var foodData = foods[food];
-
-        if (foodData != null) {
-            var data = foodData as Dictionary;
-            var calories = data[:calories];
-
-            addCalories(calories as Number);
-        }
-    }
-
+    var todayEntries = [] as Array<Dictionary>;
 
     function resetCalories() as Void {
-        totalCalories = 0;
-        Application.Storage.setValue("totalCalories", totalCalories); // Salva o valor atualizado do total de calorias
-        WatchUi.requestUpdate(); // Solicita uma atualização da interface do usuário
+        todayEntries = [];
+        saveTodayEntries();
+        WatchUi.requestUpdate();
     }
 
-//Função para obter a chave do dia atual para armazenamento - step 11
+//essa função retorna uma chave única para o dia atual no formato "dia-mês-ano", que é usada para identificar e armazenar as entradas de alimentos consumidos no dia específico. A função utiliza a classe Gregorian do módulo Time para obter informações sobre a data atual.
     function getTodayKey() as String {
         var today = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
 
         return today.day.toString() + "-" + today.month.toString() + "-" + today.year.toString();
     }
 
-//Adição de uma função para adicionar calorias ao total e atualizar a interface do usuário - step 1
-    function addCalories(value as Number) as Void {
-        totalCalories += value;
+//essa funçao adiciona uma nova entrada de alimento ao array todayEntries, que representa os alimentos consumidos no dia atual. Cada entrada contém o ID do alimento, o nome do alimento, o rótulo da porção e o valor calórico correspondente. Após adicionar a entrada, a função salva as entradas do dia atual no armazenamento do aplicativo e solicita uma atualização da interface do usuário para refletir a mudança.
+    function addFoodEntry(foodId as String, foodName as String, portionLabel as String, calories as Number) as Void {
+        var entry = {
+            "foodId" => foodId,
+            "foodName" => foodName,
+            "portionLabel" => portionLabel,
+            "calories" => calories
+        };
 
-        Application.Storage.setValue("totalCalories", totalCalories);  // Salva o valor atualizado do total de calorias - step 5
-
+        todayEntries.add(entry);
+        saveTodayEntries();
         WatchUi.requestUpdate();
     }
 
+//essa função remove a última entrada de alimento do dia, se houver alguma, e atualiza a tela para refletir a mudança.
+    function undoLastFoodEntry() as Void {
+        var entryCount = todayEntries.size();
 
-//Função para obter o total de calorias - step 2
+        if (entryCount == 0) {
+            return;
+        }
+
+        todayEntries = todayEntries.slice(0, entryCount - 1);
+        saveTodayEntries();
+        WatchUi.requestUpdate();
+    }
+
+//essa função calcula o total de calorias consumidas no dia atual, somando os valores calóricos de todas as entradas de alimentos armazenadas no array todayEntries. A função retorna o total de calorias como um número.
     function getTotalCalories() as Number {
-        return totalCalories;
+        var total = 0;
+        var entries = todayEntries as Array<Dictionary>;
+
+        for (var index = 0; index < entries.size(); index++) {
+            var entry = entries[index] as Dictionary;
+            var calories = entry["calories"];
+
+            if (calories != null) {
+                total += calories as Number;
+            }
+        }
+
+        return total;
+    }
+ 
+    function getTodayEntries() as Array {
+        return todayEntries.slice(0, todayEntries.size());
+    }
+
+//essa função salva as entradas de alimentos do dia atual no armazenamento do aplicativo, associando-as a uma chave específica que representa o dia atual. Além disso, a função também armazena a data da última vez que as entradas foram salvas, permitindo que o aplicativo recupere corretamente os dados ao ser reiniciado ou quando o usuário abrir o aplicativo em outro momento.
+    function saveTodayEntries() as Void {
+        Application.Storage.setValue("todayEntries", todayEntries);
+        Application.Storage.setValue("lastSavedDate", getTodayKey());
     }
 
     function initialize() {
         AppBase.initialize();
     }
 
-    // A cada dia novo, o total de calorias é resetado para 0. Caso contrário, o valor salvo do total de calorias é recuperado - step 13
+//essa função é chamada quando o aplicativo é iniciado. Ela verifica se há entradas de alimentos salvas para o dia atual e, se houver, as carrega para o array todayEntries. Caso contrário, a função inicializa o array como vazio e salva as entradas do dia atual no armazenamento do aplicativo. Além disso, a função também lida com a migração de dados antigos, garantindo que os registros anteriores sejam preservados.
     function onStart(state as Dictionary?) as Void {
         var todayKey = getTodayKey();
         var savedDate = Application.Storage.getValue("lastSavedDate");
 
-        var isNewDay = true;
-
         if (savedDate != null && savedDate.toString() == todayKey) {
-            isNewDay = false;
-        }
+            var savedEntries = Application.Storage.getValue("todayEntries");
 
-        if (isNewDay){
-            totalCalories = 0;
+            if (savedEntries != null) {
+                todayEntries = savedEntries as Array<Dictionary>;
+            } else {
+                // Migra o total antigo para uma entrada única sem perder o valor do dia.
+                todayEntries = [];
+                var savedCalories = Application.Storage.getValue("totalCalories");
 
-            Application.Storage.setValue("totalCalories", totalCalories);
-            Application.Storage.setValue("lastSavedDate", todayKey);
-        } else {
-            var savedCalories = Application.Storage.getValue("totalCalories");
+                if (savedCalories != null && (savedCalories as Number) > 0) {
+                    todayEntries.add({
+                        "foodId" => "legacy",
+                        "foodName" => "Total anterior",
+                        "portionLabel" => "Registro antes do histórico",
+                        "calories" => savedCalories as Number
+                    });
+                }
 
-// Recupera o valor salvo do total de calorias, se existir - step 4
-            if (savedCalories != null) {
-            totalCalories = savedCalories as Number;
+                saveTodayEntries();
             }
+        } else {
+            todayEntries = [];
+            saveTodayEntries();
         }
     }
 

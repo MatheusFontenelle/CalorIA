@@ -1,5 +1,6 @@
 <menu id="MainMenu" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
-    <menu-item id="item_1" label="@Strings.menu_label_1" />
-    <menu-item id="item_2" label="@Strings.menu_label_2" />
-    <menu-item id="item_3" label="@Strings.menu_label_3" />
+    <menu-item id="add_food" label="@Strings.menu_label_add_food" />
+    <menu-item id="view_history" label="@Strings.menu_label_view_history" />
+    <menu-item id="undo_last" label="@Strings.menu_label_undo_last"/>
+    <menu-item id="reset_day" label="@Strings.menu_label_reset_day" />
 </menu>
