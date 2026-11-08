@@ -99,7 +99,7 @@ class CalorIAApp extends Application.AppBase {
         var todayKey = getTodayKey();
         var savedDate = Application.Storage.getValue("lastSavedDate");
 
-        if (savedDate != null && savedDate.toString() == todayKey) {
+        if (savedDate != null && savedDate.toString().equals(todayKey)) {
             var savedEntries = Application.Storage.getValue("todayEntries");
 
             if (savedEntries != null) {
